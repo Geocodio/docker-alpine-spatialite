@@ -7,8 +7,8 @@ This builds a docker image that compiles the spatialite library from scratch wit
 In your Dockerfile
 
 ```
-COPY --from=spatialite /usr/lib/ /usr/lib
-COPY --from=spatialite /usr/bin/ /usr/bin
+COPY --from=geocodio/alpine-spatialite /usr/lib/ /usr/lib
+COPY --from=geocodio/alpine-spatialite /usr/bin/ /usr/bin
 ```
 
 ## Developing
