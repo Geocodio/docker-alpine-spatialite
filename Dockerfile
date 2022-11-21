@@ -1,25 +1,27 @@
-FROM alpine:3.10
+FROM alpine:3.15
 
-RUN echo "@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+RUN apk add file wget gcc g++ make cmake automake libtool autoconf curl git libc-dev sqlite sqlite-dev zlib-dev \
+    libxml2-dev libc6-compat librttopo-dev minizip-dev proj-dev fossil
 
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos-dev
-RUN apk add file wget gcc g++ make automake libtool autoconf curl git libc-dev sqlite sqlite-dev zlib-dev \
-    libxml2-dev libc6-compat
+# libgeos
+RUN wget https://download.osgeo.org/geos/geos-3.11.1.tar.bz2 && \
+    tar xvfj geos-3.11.1.tar.bz2 && \
+    cd geos-3.11.1 && \
+    cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local && \
+    make && \
+    ctest && \
+    make install
 
-RUN wget https://download.osgeo.org/proj/proj-6.2.0.tar.gz && tar zxvf proj-6.2.0.tar.gz && mv proj-6.2.0 proj
-RUN wget https://download.osgeo.org/proj/proj-datumgrid-1.8.zip && unzip -o proj-datumgrid-1.8.zip -d proj/data
-RUN cd proj && ./configure && make -j8 && make install
+# libspatialite
+RUN fossil clone https://www.gaia-gis.it/fossil/libspatialite libspatialite.fossil --user anonymous
 
-RUN wget http://www.gaia-gis.it/gaia-sins/freexl-1.0.5.tar.gz && tar zxvf freexl-1.0.5.tar.gz && cd freexl-1.0.5 && \
-    ./configure && make -j8 && make install
-
-RUN git clone "https://git.osgeo.org/gitea/rttopo/librttopo.git" && cd librttopo && ./autogen.sh && \
-    ./configure && make -j8 && make install
-
-ENV CPPFLAGS "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
-RUN wget http://www.gaia-gis.it/gaia-sins/libspatialite-4.3.0a.tar.gz && \
-    tar zxvf libspatialite-4.3.0a.tar.gz && cd libspatialite-4.3.0a && \
-    ./configure --disable-dependency-tracking --enable-rttopo=yes --enable-proj=yes --enable-geos=yes --enable-gcp=yes --enable-libxml2=yes && \
-    make -j8 && make install
+RUN mkdir libspatialite && \
+    cd libspatialite && \
+    fossil open ../libspatialite.fossil && \
+    ./configure --build=unknown-unknown-linux --enable-freexl=no && \
+    make -j8 && \
+    make install
 
 RUN cp -r /usr/local/lib/* /usr/lib/

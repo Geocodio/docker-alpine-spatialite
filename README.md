@@ -1,6 +1,6 @@
 # Spatialite for Alpine Linux
 
-This builds a docker image that compiles the spatialite library from scratch with all dependencies. This is necessary due to the spatialite package currently being broken (and unreliable) in Alpine testing.
+This builds a docker image that compiles the spatialite library from source with all dependencies.
 
 ## Example
 
