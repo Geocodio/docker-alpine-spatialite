@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.18
 
 RUN apk add file wget gcc g++ make cmake automake libtool autoconf curl git libc-dev sqlite sqlite-dev zlib-dev \
     libxml2-dev libc6-compat librttopo-dev minizip-dev proj-dev fossil
@@ -25,3 +25,5 @@ RUN mkdir libspatialite && \
     make install
 
 RUN cp -r /usr/local/lib/* /usr/lib/
+
+RUN sqlite3 test.db "SELECT load_extension('mod_spatialite'); SELECT spatialite_version();"

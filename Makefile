@@ -6,7 +6,7 @@ org = geocodio
 name = alpine-spatialite
 
 build:
-	docker build -t $(org)/$(name) .
+	docker build -t $(org)/$(name) --progress=plain .
 
 deploy:
 	docker push $(org)/$(name)
